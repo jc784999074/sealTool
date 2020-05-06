@@ -1,0 +1,643 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<style>
+			*{border: 0;margin: 0;padding: 0;vertical-align: middle;}
+			html,body{height: 100%;}
+			body{padding-top: 40px;box-sizing: border-box;}
+			#nav{position: fixed;top: 0;left: 0;z-index: 1;width: 100%;background: #72a1d0;overflow: hidden;height: 40px;text-align: center;line-height: 40px;color: #fff;}
+			#aleft{float: left;background: #778899;height: 100%;width: 20%;}
+			#contract_content{height:100%;float: left;width: 60%;height: 100%;overflow-y: scroll;overflow-x: hidden;}
+			.mark{position: absolute;top:0;}
+			.mark img:first-child{width: 100%;}
+			#mark,#marksign{top:0;left: 0;position:absolute;}
+			#mark{top: 110px;}
+			#seal_info{float: left ;background: #778899;height: 100%;width: 20%;position: relative;}
+			#seal_info .tip{color: #fff;font-size: 14px;margin: 15px;text-align: center;}
+			#xieyi{display: none;background: #fff;position: relative;width: 100%;}
+			#xieyi > div.xyimg{position: relative;top:0;left: 0;box-shadow: 0 0 2px 0 #999;}
+			.img{width: 100%;}
+			.imgB_id{display: none;}
+			.imgB_delete{position: absolute;top: -12px;right: -12px;cursor: pointer;}
+			#fenyeparent{background: url(img/page.png);position: absolute;right: 0;top: 49%;width: 48px;height: 30px;line-height: 30px; z-index: 1;color: white;overflow: hidden;display: none;}
+			#fenye{display:none;overflow: hidden;width: 48px;height: 30px;width: 50%;float: left;text-align: right;}
+			#fenyebrother{width: 50%;float: right;text-align: center;}
+			#h5sign{position: absolute;top: 40%;left: 45%;}
+			.duoye,.getxy{margin: 15px;background: #fff;text-align: center;}
+			.duoye button,.getxy button{width: 100%;height: 100%;padding:4px 10px;cursor: pointer;background: #fff;}
+			.getxy button:active{background: #0000FF;}
+			#groups {font-size: 12px;color: #fff;text-align: center;padding: 0 5px;}
+			#upload_button{z-index: 99; width: 20%;    height: 100%;    border-radius: 0 30px 30px 0;color: #fff;background: #4a90e2;cursor: pointer;}
+			#loadBox{ position: fixed;text-align: center;top: 50%;left: 50%;transform: translate(-50%,-50%);box-shadow: 0px 0px 2px 0 #ddd;height: 38px;width: 408px;border-radius: 30px;}
+			.upLoad_p{    text-indent: 50px;    line-height: 38px;    white-space: nowrap;    font-size: 14px;    overflow: hidden;height:100%;width:80% ;display: inline-block;background: url(img/upload.png) no-repeat 20px 2px;background-size: 30px;border-radius: 30px 0 0 30px;}
+			#upLoad{    position: absolute;left:0;top:0;opacity: 0; cursor: pointer;height:100%;width: 80%;}
+			.markTxt{
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				font-size: 14px;
+				color: #fff;
+			}			
+			
+			.shadow{background: rgba(0, 0, 0, .7);position: fixed;width: 100%;height: 100%;}
+			.shadowin{width: 90px;
+				height: 90px;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				}
+
+			svg.svg_loading {
+				width: 60%;
+				stroke-dasharray: 240;
+				animation: svg_loading 2.8s linear infinite;
+			}
+
+			@keyframes svg_loading {
+				0% {transform: rotate(0deg);
+					stroke-dashoffset: 240;
+				}
+				50% {
+					transform: rotate(180deg);
+					stroke-dashoffset: 0;
+				}
+				100%{
+					transform: rotate(720deg);
+					stroke-dashoffset: 240;
+				}
+			}
+		</style>
+	<script src="js/jquery1.11.3.min.js"></script>
+	<script src="js/ajaxfileupload.js"></script>
+	<script>
+	$(function(){
+		$.globalIndex=1;
+		$("#upload_button").click(function(){
+			startDrag(Array.from({length: 5},(v,i)=>i))
+			/*
+			if(!$("#upLoad").val()){
+				alert("请选择文件");
+				return;
+			}
+			$(".shadow").show();
+			$.ajaxFileUpload
+            (
+                {
+                    url: '/positionTools/signPosition/createImg.jspa', //用于文件上传的服务器端请求地址
+                    secureuri: false, //是否需要安全协议，一般设置为false
+                    fileElementId: 'upLoad', //文件上传域的ID
+                    dataType: 'json', //返回值类型 一般设置为json
+                    success: function (data, status)  //服务器成功响应处理函数
+                    {
+						$(".shadow").hide();
+						for(var i=0;i<data.data.list.length;i++){
+							data.data.list[i]="/positionTools/"+data.data.list[i];
+						}
+                        startDrag(data.data.list)
+                    },
+                    error: function (data, status, e)//服务器响应失败处理函数
+                    {
+                    	
+                    		alert('上传出错');
+						$(".shadow").hide();
+                    }
+                }
+            )
+			*/
+		});
+		$("#upLoad").click(function(){
+			$(".upLoad_p i").text('');
+			$(this).val('')
+		});
+		$("#upLoad").change(function(){
+			$(".upLoad_p i").append($(this).val());
+		})
+	})
+	//页数百分比滚动显示
+/*	$(function(){
+		var aImg=[
+					"img/xy.jpg","img/xy.jpg","img/xy.jpg","img/xy.jpg","img/xy.jpg","img/xy.jpg","img/xy.jpg"
+				];
+		var fenye=$("#fenye");
+		var fenyep=$("#fenyeparent")
+		var i=0;
+		for(i=0;i<aImg.length;i++)
+		{	
+			$("<div class='xyimg' ><img class='img' src="+aImg[i]+" /></div>").appendTo("#xieyi");
+			var yeshu=i+1;
+			$("<p class='fenye'>"+yeshu+"</p>").appendTo("#fenye");
+			$("#fenyebrother").text("/"+aImg.length);
+			fenyep.css({"right":$("#seal_info").width()-40})
+		};
+		$("#contract_content").scroll(function(){
+			fenye.scrollTop(fenye.height()*$(this).scrollTop()/$(this).height()*$(this).height()/$(".xyimg").height());
+			//注意单页的高度和父级的高度
+			fenyep.css({"top":parseFloat($(this).scrollTop()/($("#xieyi").height()))*100+"%"});
+			fenyep.css({"top":parseFloat(fenyep.css("top"))+$("#seal_info").scrollTop()+"px"});
+			fenyep.stop();
+			fenyep.fadeIn(200,function(){
+				clearTimeout(timer);
+				var timer=setTimeout(function(){
+					fenyep.fadeOut(1500)
+				})
+			});
+		});
+	})*/
+
+//图片事件处理
+	function startDrag(aImg)
+	{
+		$("#loadBox").hide();
+		$("#xieyi").show();
+		var fenyep=$("#fenyeparent");
+		$("#fenyebrother").css("width","100%");
+		fenyep.css({"right":$("#seal_info").width()-40});
+		var oXieyi=$("#xieyi");
+		oXieyi.html("");
+		
+		for(var i in aImg){
+			
+			var ele=$("<div class='xyimg' ><img class='img' src='https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1588765132068&di=86f02e42dee3abb7b86664949e519ec3&imgtype=0&src=http%3A%2F%2Ftxt25-2.book118.com%2F2017%2F0112%2Fbook82531%2F82530434.png' /></div>");
+			ele.appendTo(oXieyi);
+			if(aImg.length==1){
+				ele[0].getElementsByTagName('img')[0].onload=function(){
+						var aMark=document.getElementsByClassName("mark");
+						var oMark=document.getElementById("mark").getElementsByTagName("img")[0];
+						drag(aMark,oMark)
+					}
+			}else{
+				if(i==aImg.length-1){
+					ele[0].getElementsByTagName('img')[0].onload=function(){
+						var aMark=document.getElementsByClassName("mark");
+						var oMark=document.getElementById("mark").getElementsByTagName("img")[0];
+						drag(aMark,oMark)
+					}
+				}
+			}			
+		}
+			
+		$("#contract_content").scroll(function(){
+			var oHeight=$(this).scrollTop()+$(this).height()+oXieyi.find("div.xyimg").eq(0).height()/2;
+			
+			for(var i=0;i<oXieyi.find("div.xyimg").length;i++)
+			{
+				if(oHeight-oXieyi.height()/oXieyi.find("div.xyimg").length*(i+1)>0)
+				{
+					$("#fenyebrother").text(i+1+"/"+oXieyi.find("div.xyimg").length);
+				}else{
+					break;
+				}
+			}
+			fenyep.stop();
+			fenyep.fadeIn(200,function(){
+				clearTimeout(timer);
+				var timer=setTimeout(function(){
+					fenyep.fadeOut(1500)
+				})
+			});
+		});
+		$("#reBtn").click(function(){
+			$("#xieyi").hide();
+			$("#loadBox").show();
+			$(".upLoad_p i").text('');
+		});
+		$("#getxy").click(function(){
+			$("#groups").html("");
+			var aMark=$('.mark:not(#mark)'),data=[];
+			aMark.each(function(index,ele){
+				var page=ele.getAttribute("pagenum"),
+					x=ele.getAttribute("xnum"),
+					y=ele.getAttribute("ynum"),
+					nametxt=ele.getElementsByClassName("markTxt")[0].innerHTML;
+				var oLi={};
+				oLi.positionName=nametxt;
+				oLi.page=page;
+				oLi.x=x;
+				oLi.y=y;
+				data.push(oLi);
+			});
+			$("#groups").html(JSON.stringify(data));
+		})
+		function drag(aMark,oMark)
+		{
+			//多页盖章
+			var duoye=0;
+			$("#duoye").click(function(){
+						duoye=1;
+						$(this).css({"background":"#4a90e2","color":"white"})
+						})
+			//公用
+			var oXieyi=document.getElementsByClassName("img")[0];
+			var oXieyiall=oXieyi.parentNode.parentNode;
+			var w_scrollbar=oXieyiall.parentNode.offsetWidth-oXieyiall.parentNode.scrollWidth;
+			ll=oXieyi.parentNode.offsetWidth;
+			rr=oXieyi.parentNode.offsetHeight;
+			var oMarkcc=getImgNaturalDimensions(oMark);//实际宽高
+			var imgOrigin=getImgNaturalDimensions(oXieyi);//实际宽高
+			//$(".xyimg").css({"width":imgOrigin[0]+"px","height":imgOrigin[1]+"px"})
+			//使印章与协议图所防备率一样
+			var oMarkWidth=oXieyi.parentNode.parentNode.parentNode.offsetWidth/imgOrigin[0]*oMarkcc[0]*2*0.75;
+			//右侧印章最大为原始大小
+			if (oMarkWidth > oMarkcc[0]*2) {//2dpi乘2
+				oMark.style.width = oMarkcc[0]*2  + "px";//2dpi乘2
+				oMark.setAttribute("presentWidth", oMarkWidth);
+			} else {
+				oMark.style.width = oMarkWidth + "px";
+			}
+			for(var i=0;i<aMark.length;i++)
+			{
+				aMark[i].onmousedown=function(eve)
+				{
+					var l,r;//坐标
+					var othis=this;
+					//移动
+					var disX=0;
+					var disY=0;
+					var oEvent=eve||event;
+					disX=oEvent.clientX-othis.offsetLeft;
+					disY=oEvent.clientY-othis.offsetTop;
+					if(othis.id)
+					{
+						//克隆对象
+						var cMark = othis.cloneNode(true);
+						var txt=document.createElement("p");
+						txt.innerHTML="位置"+$.globalIndex;
+						txt.className='markTxt';
+						cMark.appendChild(txt);
+						$.globalIndex++;
+						var linshi=cMark.getElementsByTagName("img")[0].getAttribute("presentWidth");
+						//插入
+						oXieyiall.appendChild(cMark);
+						cMark.style.cssText="left:99999px;visibility:hidden;";//兼容单机印章不移动时造成添加印章效果
+						if(linshi)
+						{
+							cMark.getElementsByTagName("img")[0].style.cssText="";
+							cMark.style.width=linshi+"px";
+						}
+					}else{
+						cMark=othis;
+					}
+					cMark.style.zIndex="99";//防止当前印章被挡住2016/5/21
+					if(cMark.getElementsByClassName){
+							var linshi=cMark.getElementsByClassName("imgB_delete")[0];
+						}else{
+							var linshi=document.getElementsByClassName("imgB_delete",cMark)[0];
+					}
+					linshi.onclick=function(e){
+							var e = window.event || e; 
+							if ( e.stopPropagation ){ //如果提供了事件对象，则这是一个非IE浏览器 
+							e.stopPropagation(); 
+							}else{ 
+							//兼容IE的方式来取消事件冒泡 
+							window.event.cancelBubble = true; 
+							}
+							this.parentNode.parentNode.removeChild(this.parentNode);
+							return false;
+					};
+					document.onmousemove=function(eve)
+					{
+						var oEvent=eve||event;
+						l=oEvent.clientX-disX;
+						r=oEvent.clientY-disY;
+						if(cMark.id)
+						{
+							cMark.style.visibility="visible";
+							cMark.style.left=l+oXieyiall.parentNode.offsetWidth+'px';
+							cMark.style.top=r+oXieyiall.parentNode.scrollTop-$("#seal_info").scrollTop()+'px';
+						}
+						else
+						{
+							if(l<0){
+								l=0;
+							}else if(l+cMark.offsetWidth>ll){
+								l=ll-cMark.offsetWidth;
+							}
+							if(r<0){
+								r=0;
+							}else if(r+cMark.offsetHeight>oXieyi.offsetHeight){
+								r=oXieyi.offsetHeight-cMark.offsetHeight;
+							}
+							cMark.style.left=l+'px';
+							cMark.style.top=r+'px';
+						}
+						function scrollFunc(e)
+						{
+							var e=e||event;
+							return false;
+							e.preventDefault();
+						}
+						 if(document.addEventListener){
+						     document.addEventListener('DOMMouseScroll',scrollFunc(),false);
+						 }
+						 document.onmousewheel=scrollFunc;//IE/Opera/Chrome/Safari
+					};
+					document.onmouseup=function()
+					{
+						if(cMark.id)
+						{
+							var oRange=1;//是否超出
+							l=l+ll+w_scrollbar;
+							//插入
+							cMark.style.top=cMark.offsetTop+"px";
+							cMark.getElementsByTagName("img")[1].className="imgB_delete";
+							var aPDF=document.getElementsByClassName("xyimg");
+							for(var i=0;i<aPDF.length;i++)
+							{
+								if(cMark.offsetTop+cMark.offsetHeight-(rr*(i+1))<0)
+								{
+									if(oXieyi.getElementsByClassName)
+									{
+										oXieyiall.getElementsByClassName("xyimg")[i].appendChild(cMark);
+									}
+									else
+									{
+										document.getElementsByClassName("xyimg",oXieyiall)[i].appendChild(cMark);
+									}
+									oRange=0;
+									r=cMark.offsetTop-rr*i;
+									cMark.style.top=r+"px";
+									cMark.setAttribute("pagenum",i+1);
+									break;
+								}
+							}
+							cMark.removeAttribute("id");
+							if(cMark.offsetLeft<0||cMark.offsetTop<0||cMark.offsetLeft+cMark.offsetWidth>ll||cMark.offsetTop+cMark.offsetHeight>oXieyiall.offsetHeight||oRange==1)
+							{
+								cMark.parentNode.removeChild(cMark);
+								console.log("超出协议范围")
+								duoye=0;
+								$("#duoye").css({"background":"none","color":"#4a90e2"});
+								$.globalIndex--;
+							}
+						}
+							//比例转换
+							l=l*imgOrigin[0]/ll;
+							r=(oXieyi.offsetHeight-(r+cMark.offsetHeight))*imgOrigin[0]/ll;//左下角
+							cMark.setAttribute("xnum",parseInt(l));
+							cMark.setAttribute("ynum",parseInt(r));
+							if(duoye=="1")
+							{
+								if(!aPDF)
+								{
+									duoye=0;
+									$("#duoye").css({"background":"none","color":"#4a90e2"})
+								}else{
+									for(var i=0;i<aPDF.length;i++)
+									{
+										var ccMark = cMark.cloneNode(true);
+										if(cMark.getElementsByClassName){
+												var linshi=ccMark.getElementsByClassName("imgB_delete")[0];
+											}else{
+												var linshi=document.getElementsByClassName("imgB_delete",ccMark)[0];
+										}
+										linshi.onclick=function(e){
+												var e = window.event || e; 
+												if ( e.stopPropagation ){ //如果提供了事件对象，则这是一个非IE浏览器 
+												e.stopPropagation(); 
+												}else{ 
+												//兼容IE的方式来取消事件冒泡 
+												window.event.cancelBubble = true; 
+												}
+												this.parentNode.parentNode.removeChild(this.parentNode);
+												this.setAttribute("pagenum",i+1);
+												return false;
+										};
+										document.getElementsByClassName("xyimg")[i].appendChild(ccMark);
+										/*if(navigator.userAgent.indexOf("MSIE")>0)  //兼容IE8 position relative 错位
+											{   
+											    if(navigator.userAgent.indexOf("MSIE 8.0")>0)  
+											    {  
+												  ccMark.style.top=ccMark.offsetTop+rr*i+"px";
+											    }   
+											}*/
+									}
+									cMark.parentNode.removeChild(cMark);
+									duoye=0;
+									$("#duoye").css({"background":"none","color":"#4a90e2"})
+								}
+							}
+						document.onmousewheel=null;
+						document.onmousemove=null;
+						othis.onmousedown=null;
+						document.onmouseup=null;
+						drag(aMark,oMark);
+						cMark.style.zIndex="0";//防止当前印章被挡住
+					}
+					return false;//低版本FF兼容、、空DIV拖拽出BUG
+				};
+			}
+			window.onresize=function()
+			{
+				ll=oXieyi.offsetWidth;//重新获取
+				function imgresize(allMark, oMarkcc) {
+					for (var i = 0; i < allMark.length; i++) {
+						if(!allMark[i].id){
+							allMark[i].getElementsByTagName("img")[0].style.width = ll / imgOrigin[0] * oMarkcc[0]*0.75 + "px";
+							allMark[i].style.top = ll / imgOrigin[0] * (imgOrigin[1] - allMark[i].getAttribute("ynum") - oMarkcc[1]*0.75) + "px";
+							allMark[i].style.left = ll / imgOrigin[0] * allMark[i].getAttribute("xnum") + "px";
+						}
+					}
+				}
+
+				var oMark = document.getElementById("mark");
+		        if(oMark){
+		        	var oMarkImg= oMark.getElementsByTagName("img")[0];
+		        	var oMarkcc = getImgNaturalDimensions(oMarkImg);//实际宽高
+			        oMarkcc[0]=oMarkcc[0]*2;//2dpi
+			        oMarkcc[1]=oMarkcc[1]*2;
+			        var aMark = document.getElementsByClassName("mark");
+		        	imgresize(aMark, oMarkcc);
+		        	drag(aMark,oMarkImg)
+		        }
+				
+//				var oMarksign=document.getElementById("marksign").getElementsByTagName("img")[0];
+//				var oMarksigncc=getImgNaturalDimensions(oMarksign);//实际宽高
+//				aMark=document.getElementsByClassName("marksign");
+//				imgresize(aMark,oMarksigncc);
+				
+//				var oMarkh5sign=aMark[0].getElementsByTagName("img")[0];
+//				var oMarkh5signcc=getImgNaturalDimensions(oMarkh5sign);//实际宽高
+//				aMark=document.getElementsByClassName('h5sign');
+//					imgresize(aMark,oMarkh5signcc);
+				}
+			}
+			
+			//var aMarksign=document.getElementsByClassName("marksign");
+			//var oMarksign=document.getElementById("marksign").getElementsByTagName("img")[0];
+			//drag(aMarksign,oMarksign);
+			//inserth5Fn("img/sign.jpg");
+		}
+		function inserth5Fn(h5src)
+		{
+			//H5签名
+			var linshi,oH5div,oH5,oH5delete;
+			oH5div=document.createElement("div");
+			oH5=document.createElement("img");
+			oH5delete=document.createElement("img");
+			oH5delete.src="img/btn_delete stamp.png";
+			oH5delete.className="imgB_delete";
+			oH5div.id="h5sign";
+			oH5div.appendChild(oH5);
+			oH5div.appendChild(oH5delete);
+			oH5.src=h5src;//图片src
+			//比例缩放
+			var oXieyi=document.getElementsByClassName("img")[0];
+			ll=oXieyi.parentNode.offsetWidth;
+			var imgOrigin=getImgNaturalDimensions(oXieyi);//实际宽高
+			//使印章与协议图所防备率一样
+			oH5.style.width=ll/imgOrigin[0]*getImgNaturalDimensions(oH5)[0]+"px";
+			if(oH5div.getElementsByClassName){
+					linshi=oH5div.getElementsByClassName("imgB_delete")[0];
+				}else{
+					linshi=document.getElementsByClassName("imgB_delete",oH5div)[0];
+			}
+			linshi.onclick=function(e){
+					var e = window.event || e; 
+					if ( e.stopPropagation ){ //如果提供了事件对象，则这是一个非IE浏览器 
+					e.stopPropagation(); 
+					}else{ 
+					//兼容IE的方式来取消事件冒泡 
+					window.event.cancelBubble = true; 
+					}
+					this.parentNode.parentNode.removeChild(this.parentNode);
+					return false;
+			};
+			var nPage=$("#fenyebrother").text();
+			var oPage=nPage.substring(0,nPage.indexOf("/"));
+			if(oPage=="")oPage=1;
+			document.getElementsByClassName("xyimg")[oPage-1].appendChild(oH5div);
+			function moveFn()
+			{
+					oH5div.onclick=function(eve){
+					var oEvent = window.event || eve;
+					var l,r;//坐标
+					var othis=this;
+					//移动
+					var disX=0;
+					var disY=0;
+					var oEvent=eve||event;
+					disX=oEvent.clientX-othis.offsetLeft;
+					disY=oEvent.clientY-othis.offsetTop;
+					document.onmousemove=function(eve)
+						{
+							function scrollFunc(e)
+							{
+								var e=e||event;
+								return false;
+								e.preventDefault();
+							}
+							 if(document.addEventListener){
+							     document.addEventListener('DOMMouseScroll',scrollFunc(),false);
+							 }
+							 document.onmousewheel=scrollFunc;//IE/Opera/Chrome/Safari
+							var oEvent=eve||event;
+							l=oEvent.clientX-disX;
+							r=oEvent.clientY-disY;
+							if(l<0){
+										l=0;
+									}else if(l+othis.offsetWidth>ll){
+										l=ll-othis.offsetWidth;
+									}
+									if(r<0){
+										r=0;
+									}else if(r+othis.offsetHeight>oXieyi.offsetHeight){
+										r=oXieyi.offsetHeight-othis.offsetHeight;
+									}
+							othis.style.top=r+"px";
+							othis.style.left=l+"px";
+						}
+					othis.onclick=function(){
+						document.onmousewheel=null;
+						document.onmousemove=null;
+						l=l*imgOrigin[0]/ll;
+						r=r*imgOrigin[0]/ll;
+						r=imgOrigin[1]-(r+getImgNaturalDimensions(oH5)[1]);//左下角
+						othis.setAttribute("xnum",parseInt(l));
+						othis.setAttribute("ynum",parseInt(r));
+						othis.setAttribute("pagenum",oPage);
+						othis.onclick=null;
+						moveFn();
+					}
+				}
+			}
+			moveFn();
+		}
+	//获取图片实际尺寸
+			function getImgNaturalDimensions(img)
+			{
+			    var nWidth, nHeight
+			    if (img.naturalWidth) { // 现代浏览器
+			        nWidth = img.naturalWidth / 2;//两倍DPI除以2
+			        nHeight = img.naturalHeight / 2;//两倍DPI除以2
+			    } else { // IE6/7/8
+			        var image = new Image()
+			        image.src = img.src
+			        nWidth = image.width / 2;//两倍DPI除以2
+			        nHeight = image.height / 2;//两倍DPI除以2
+			    }
+			    return [nWidth, nHeight]
+			}
+	//禁止用ctrl+- 
+	document.onkeydown=function(event) 
+	{ event=event || window.event; 
+	if((event.ctrlKey)&&(event.keyCode==187 || event.keyCode==189||event.keyCode==107||event.keyCode==109))
+		{
+	    	event.returnValue=false;
+	    	return;
+	    } 
+	} 
+	//禁用ctrl+滚轮
+	 var scrollFunc=function(e)
+	 {
+		  e=e || window.event; 
+		  if(e.wheelDelta && event.ctrlKey){//IE/Opera/Chrome 
+		   event.returnValue=false;
+		  }else if(e.detail){//Firefox 
+		   event.returnValue=false; 
+		  } 
+	 }  
+	 /*注册事件*/ 
+	 if(document.addEventListener){ 
+	 document.addEventListener('DOMMouseScroll',scrollFunc,false); 
+	 }//W3C 
+	 window.onmousewheel=document.onmousewheel=scrollFunc;//IE/Opera/Chrome/Safari 
+	</script>
+	</head>
+
+	<body>
+		<div id="nav">
+			坐标工具
+		</div>
+		<div id="aleft">
+			<div class="getxy"><button id="getxy">获取坐标</button></div>
+			<p id='groups'></p>
+		</div>
+		<div id="contract_content">
+			<div id="xieyi"></div>
+			<div id="loadBox">
+				<span class="upLoad_p"><input id="upLoad" name="upload" type="file" /><i style="font-style: normal;"></i></span><input type="button" id="upload_button" value="预览"/>
+			</div>
+		</div>
+		<div id="seal_info">
+			<div class="duoye"><button id="reBtn" >重新上传</button><button id="duoye" style="display:none;">多页盖章</button></div>
+			<div class="tip">请使用下方蓝色区域进行拖章</div>
+			<div id="fenyeparent"><div id="fenye"></div><div id="fenyebrother"></div></div>
+			<div  class="mark" id="mark">
+				<img src="img/seal.png" /><img src="img/btn_delete stamp.png" class="imgB_delete imgB_id"/>
+			</div>
+		</div>
+		<div class="shadow" style="display:none;">
+			<div class="shadowin">
+				<svg class="svg_loading" viewBox='0 0 90 90'  preserveAspectRatio='xMidYMid meet' xmlns="http://www.w3.org/2000/svg" width="90" height="90" version="1.1">
+					<circle cx="45" cy="45" r="40" stroke="#fff" stroke-width="2" fill="transparent" />
+				</svg>
+			</div>
+		</div>
+	</body>
+
+</html>
